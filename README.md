@@ -14,6 +14,8 @@ npm run dev    # servidor local en http://127.0.0.1:8000
 npm run build  # genera la web estática en dist/
 ```
 
+Importante: el `index.html` de la raíz es el código fuente y **no funciona si se abre directamente** en el navegador, porque `script.js` importa la librería `qrcode` y necesita estar empaquetada. Para probarlo en local, o bien `npm run dev` y abrir http://127.0.0.1:8000, o bien `npm run build` y abrir `dist/index.html`.
+
 ## Estructura
 
 ```text

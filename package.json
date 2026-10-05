@@ -5,8 +5,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "esbuild index.html style.css script.js --bundle --minify --loader:.html=copy --outdir=dist",
-    "dev": "esbuild index.html style.css script.js --bundle --loader:.html=copy --outdir=dist --servedir=dist"
+    "build": "esbuild index.html style.css script.js --bundle --minify --format=iife --loader:.html=copy --outdir=dist",
+    "dev": "esbuild index.html style.css script.js --bundle --format=iife --loader:.html=copy --outdir=dist --servedir=dist"
   },
   "repository": {
     "type": "git",
