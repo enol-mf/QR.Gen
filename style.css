@@ -73,9 +73,15 @@ body {
   border-radius: 8px;
 }
 
-.input:focus {
-  outline: 2px solid var(--accent);
-  outline-offset: -1px;
+.select {
+  width: 100%;
+  padding: 10px 12px;
+  font: inherit;
+  color: var(--text);
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  cursor: pointer;
 }
 
 .error {
@@ -85,7 +91,7 @@ body {
 }
 
 .colors {
-  margin: 24px 0;
+  margin: 16px 0 24px;
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 16px;
@@ -154,8 +160,16 @@ body {
   height: 100%;
 }
 
-[hidden] {
-  display: none;
+.output__svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.output__svg svg {
+  width: 100%;
+  height: 100%;
+  display: block;
 }
 
 @media (max-width: 620px) {

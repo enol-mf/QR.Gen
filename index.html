@@ -6,6 +6,7 @@
     <title>QR.Gen</title>
     <meta name="description" content="Genera códigos QR a partir de una URL directamente en el navegador." />
     <link rel="stylesheet" href="./style.css" />
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.4/build/qrcode.js"></script>
   </head>
   <body>
     <main class="card">
@@ -26,14 +27,26 @@
           />
           <p class="error" id="error" role="alert" hidden></p>
 
+          <div class="shape">
+            <label class="label shape__label" for="shape">Forma de módulos</label>
+            <select class="select" id="shape">
+              <option value="square">Cuadrados</option>
+              <option value="circle">Círculos</option>
+              <option value="diamond">Rombos</option>
+              <option value="triangle">Triángulos</option>
+              <option value="heart">Corazones</option>
+              <option value="spade">Picas</option>
+            </select>
+          </div>
+
           <div class="colors">
             <div class="color">
               <label class="label color__label" for="dark">Módulos</label>
-              <input class="color__input" id="dark" type="color" value="#111111" />
+              <input class="color__input" id="dark" type="color" value="#ededed" />
             </div>
             <div class="color">
               <label class="label color__label" for="light">Fondo</label>
-              <input class="color__input" id="light" type="color" value="#ffffff" />
+              <input class="color__input" id="light" type="color" value="#0f0f0f" />
             </div>
           </div>
 
@@ -42,6 +55,7 @@
 
         <div class="output">
           <div class="output__frame">
+            <div class="output__svg" id="svg-host" hidden aria-hidden="true"></div>
             <canvas class="output__canvas" id="canvas" width="512" height="512" hidden></canvas>
           </div>
           <button class="button button--secondary" id="download" type="button" hidden>Descargar JPG</button>
