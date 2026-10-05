@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>QR.Gen</title>
+    <meta name="description" content="Genera códigos QR a partir de una URL directamente en el navegador." />
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <main class="card">
+      <h1 class="card__title">Generador de QR</h1>
+
+      <form class="form" id="form" novalidate>
+        <label class="form__label" for="url">URL</label>
+        <input
+          class="form__input"
+          id="url"
+          name="url"
+          type="text"
+          inputmode="url"
+          autocomplete="url"
+          spellcheck="false"
+          placeholder="https://example.com"
+        />
+        <p class="form__error" id="error" role="alert" hidden></p>
+        <button class="button" type="submit">Generar QR</button>
+      </form>
+
+      <div class="result" id="result" hidden>
+        <canvas class="result__canvas" id="canvas" width="256" height="256"></canvas>
+      </div>
+    </main>
+
+    <script type="module" src="./script.js"></script>
+  </body>
+</html>

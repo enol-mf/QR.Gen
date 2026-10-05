@@ -1,0 +1,22 @@
+{
+  "name": "qr-gen",
+  "version": "1.0.0",
+  "description": "Generador de códigos QR a partir de una URL, ejecutado íntegramente en el navegador.",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "esbuild index.html style.css script.js --bundle --minify --loader:.html=copy --outdir=dist",
+    "dev": "esbuild index.html style.css script.js --bundle --loader:.html=copy --outdir=dist --servedir=dist"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/enol-mf/QR.Gen.git"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "qrcode": "^1.5.4"
+  },
+  "devDependencies": {
+    "esbuild": "^0.28.2"
+  }
+}
