@@ -2,6 +2,12 @@
 
 Generador de códigos QR a partir de una URL. Todo el procesamiento ocurre en el navegador: las URLs no se envían a ningún servidor ni se almacenan.
 
+## Funcionalidad
+
+1. Campo para introducir la URL y botón `Generar QR` (también con `Enter`).
+2. Selector de color para los módulos y para el fondo. Los cambios se aplican al pulsar `Generar QR`.
+3. Botón `Descargar JPG` para guardar el código generado.
+
 ## Requisitos
 
 Node.js 18 o superior.
