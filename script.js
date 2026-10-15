@@ -96,7 +96,7 @@ import {
       .replace(/[^a-z0-9.-]/gi, '-')
       .slice(0, 50);
 
-    return `${host || 'qr'}.jpg`;
+    return `${host || 'qr'}.png`;
   }
 
   function svgToDataURL(svg) {
@@ -213,11 +213,13 @@ import {
     }
   }
 
-  function downloadJPG() {
+  function downloadPng() {
     const svg = svgHost.innerHTML;
     if (!svg) return;
-    downloadImage(svg, lightInput.value, canvas, fileName(), 'image/jpeg');
+    downloadImage(svg, lightInput.value, canvas, fileName(), 'image/png');
   }
+
+  download.addEventListener('click', downloadPng);
 
   form.addEventListener('submit', (event) => {
     event.preventDefault();
