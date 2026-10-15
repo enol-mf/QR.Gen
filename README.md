@@ -2,6 +2,10 @@
 
 Generador de códigos QR a partir de una URL. Todo el procesamiento ocurre en el navegador: las URLs no se envían a ningún servidor ni se almacenan.
 
+## Link
+
+https://qrgent.vercel.app/
+
 ## Funcionalidad
 
 1. Campo para introducir la URL y botón `Generar QR` (también con `Enter`).
