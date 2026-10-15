@@ -71,8 +71,11 @@ function shapePath(shape, cx, cy, r) {
     case 'triangle':
       return `<polygon points="${cx},${cy - rr / 2} ${cx + rr / 2},${cy + rr / 2} ${cx - rr / 2},${cy + rr / 2}"/>`;
     case 'heart': {
-      const s = rr / 2.6;
-      return `<path d="M ${cx - s},${cy - s / 2} C ${cx - s * 1.8},${cy - s * 1.4} ${cx - s * 1.8},${cy + s * 0.6} ${cx - s},${cy + s * 1.2} C ${cx + s},${cy + s * 1.2} ${cx + s * 1.8},${cy + s * 0.6} ${cx + s},${cy - s / 2} C ${cx + s * 0.4},${cy - s * 1.1} ${cx - s * 0.4},${cy - s * 1.1} ${cx - s},${cy - s / 2} Z"/>`;
+      const k = rr / 100;
+      const x = cx - rr / 2;
+      const y = cy - rr / 2;
+      const p = (px, py) => `${(x + px * k).toFixed(2)},${(y + py * k).toFixed(2)}`;
+      return `<path d="M ${p(50, 96)} C ${p(22, 74)} ${p(4, 56)} ${p(4, 34)} C ${p(4, 17)} ${p(17, 6)} ${p(31, 6)} C ${p(41, 6)} ${p(47, 12)} ${p(50, 20)} C ${p(53, 12)} ${p(59, 6)} ${p(69, 6)} C ${p(83, 6)} ${p(96, 17)} ${p(96, 34)} C ${p(96, 56)} ${p(78, 74)} ${p(50, 96)} Z"/>`;
     }
     case 'spade': {
       const s = rr / 2.8;
