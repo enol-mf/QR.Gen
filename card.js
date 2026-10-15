@@ -77,7 +77,7 @@ export function buildCardUrl(card) {
   return `${base}#${encodeCard(card)}`;
 }
 
-export function renderCard(card) {
+export function renderCard(card, qrSvg) {
   const el = document.createElement('article');
   el.className = 'biz-card';
   el.style.setProperty('--card-bg', card.bg || '#171717');
@@ -129,20 +129,34 @@ export function renderCard(card) {
   if (card.instagram) links.push(['Instagram', card.instagram]);
   if (card.x) links.push(['X', card.x]);
 
-  if (links.length) {
-    const list = document.createElement('ul');
-    list.className = 'biz-card__links';
-    links.forEach(([label, href]) => {
-      const item = document.createElement('li');
-      const link = document.createElement('a');
-      link.href = href;
-      link.textContent = label;
-      link.target = '_blank';
-      link.rel = 'noopener noreferrer';
-      item.appendChild(link);
-      list.appendChild(item);
-    });
-    el.appendChild(list);
+  if (links.length || qrSvg) {
+    const footer = document.createElement('div');
+    footer.className = 'biz-card__footer';
+
+    if (links.length) {
+      const list = document.createElement('ul');
+      list.className = 'biz-card__links';
+      links.forEach(([label, href]) => {
+        const item = document.createElement('li');
+        const link = document.createElement('a');
+        link.href = href;
+        link.textContent = label;
+        link.target = '_blank';
+        link.rel = 'noopener noreferrer';
+        item.appendChild(link);
+        list.appendChild(item);
+      });
+      footer.appendChild(list);
+    }
+
+    if (qrSvg) {
+      const qr = document.createElement('div');
+      qr.className = 'biz-card__qr';
+      qr.innerHTML = qrSvg;
+      footer.appendChild(qr);
+    }
+
+    el.appendChild(footer);
   }
 
   return el;

@@ -429,10 +429,27 @@ import {
     return { card };
   }
 
+  function cardQrSvg(card) {
+    try {
+      const url = buildCardUrl(card);
+      if (url.length > MAX_CARD_URL) return '';
+      return buildQrSvg(url, {
+        size: 128,
+        margin: 4,
+        shape: 'square',
+        ecc: 'M',
+        dark: card.fg || '#ededed',
+        light: card.bg || '#171717',
+      });
+    } catch (e) {
+      return '';
+    }
+  }
+
   function updateCardPreview() {
     const result = collectCard(false);
     if (result.error) return;
-    cardPreview.replaceChildren(renderCard(result.card));
+    cardPreview.replaceChildren(renderCard(result.card, cardQrSvg(result.card)));
   }
 
   cardForm.addEventListener('input', updateCardPreview);
@@ -472,7 +489,7 @@ import {
 
   function showViewer(card) {
     showView('viewer');
-    viewerCard.replaceChildren(renderCard(card));
+    viewerCard.replaceChildren(renderCard(card, cardQrSvg(card)));
   }
 
   tabs.addEventListener('click', (event) => {

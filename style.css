@@ -427,11 +427,19 @@ body {
   -webkit-box-orient: vertical;
 }
 
+.biz-card__footer {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  min-width: 0;
+  margin-top: auto;
+}
+
 .biz-card__links {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  margin: auto 0 0;
+  margin: 0;
   padding: 0;
   list-style: none;
 }
@@ -448,6 +456,19 @@ body {
 
 .biz-card__links a:hover {
   background: color-mix(in srgb, var(--card-fg, #ededed) 22%, transparent);
+}
+
+.biz-card__qr {
+  flex: 0 0 auto;
+  width: 64px;
+  height: 64px;
+  margin-left: auto;
+}
+
+.biz-card__qr svg {
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 
 .view--viewer {
