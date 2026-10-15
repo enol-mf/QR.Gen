@@ -1,12 +1,6 @@
+import QRCode from 'qrcode';
+
 (function () {
-  var QRCode = window.QRCode;
-
-  if (!QRCode) {
-    try {
-      QRCode = require && require('qrcode');
-    } catch (e) {}
-  }
-
 const form = document.getElementById('form');
 const input = document.getElementById('url');
 const error = document.getElementById('error');
@@ -90,10 +84,12 @@ function shapePath(shape, cx, cy, r) {
 }
 
 function renderQR(text) {
-  QRCode.create(text, {
-    errorCorrectionLevel: 'M',
-    version: undefined,
-  })
+  Promise.resolve().then(() =>
+    QRCode.create(text, {
+      errorCorrectionLevel: 'M',
+      version: undefined,
+    })
+  )
     .then((qrData) => {
       const size = qrData.modules.size;
       const data = qrData.modules.data;
@@ -125,7 +121,7 @@ function renderQR(text) {
       download.hidden = true;
       canvas.hidden = true;
       showError('No se ha podido generar el código QR. Prueba con una URL más corta.');
-})();
+    });
 
 }
 
