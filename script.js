@@ -68,6 +68,7 @@ import {
 
   let logoDataURL = '';
   let currentText = '';
+  let cardQrLight = '#ffffff';
 
   function showError(message) {
     error.textContent = message;
@@ -470,8 +471,11 @@ import {
     }
 
     try {
-      const svg = buildQrSvg(url, { ecc: 'M', shape: 'square', dark: '#000000', light: '#ffffff' });
+      const light = result.card.bg || '#171717';
+      const dark = result.card.fg || '#ededed';
+      const svg = buildQrSvg(url, { ecc: 'M', shape: 'square', dark, light });
       renderSvg(svg, cardSvgHost);
+      cardQrLight = light;
       cardDownload.hidden = false;
       clearCardError();
     } catch (e) {
@@ -484,7 +488,7 @@ import {
   cardDownload.addEventListener('click', () => {
     const svg = cardSvgHost.innerHTML;
     if (!svg) return;
-    downloadImage(svg, '#ffffff', cardCanvas, 'tarjeta-qr.png', 'image/png');
+    downloadImage(svg, cardQrLight, cardCanvas, 'tarjeta-qr.png', 'image/png');
   });
 
   function showViewer(card) {
