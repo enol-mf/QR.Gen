@@ -4,68 +4,162 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>QR.Gen</title>
-    <meta name="description" content="Genera códigos QR a partir de una URL directamente en el navegador." />
+    <meta name="description" content="Genera códigos QR y tarjetas de visita digitales directamente en el navegador." />
     <link rel="stylesheet" href="./style.css" />
   </head>
   <body>
-    <main class="card">
-      <h1 class="card__title">Generador de QR</h1>
+    <main class="card" id="app">
+      <h1 class="card__title" id="app-title">QR.Gen</h1>
 
-      <form class="form" id="form" novalidate>
-        <div class="controls">
-          <label class="label" for="url">URL</label>
-          <input
-            class="input"
-            id="url"
-            name="url"
-            type="text"
-            inputmode="url"
-            autocomplete="url"
-            spellcheck="false"
-            placeholder="https://example.com"
-          />
-          <p class="error" id="error" role="alert" hidden></p>
+      <nav class="tabs" id="tabs">
+        <button class="tab is-active" type="button" data-view="qr">Generador de QR</button>
+        <button class="tab" type="button" data-view="card">Tarjetas Personales</button>
+      </nav>
 
-          <div class="shape">
-            <label class="label shape__label" for="shape">Forma de módulos</label>
-            <select class="select" id="shape">
-              <option value="square">Cuadrados</option>
-              <option value="circle">Círculos</option>
-            </select>
+      <section class="view" id="view-qr">
+        <form class="form" id="form" novalidate>
+          <div class="controls">
+            <label class="label" for="url">URL</label>
+            <input
+              class="input"
+              id="url"
+              name="url"
+              type="text"
+              inputmode="url"
+              autocomplete="url"
+              spellcheck="false"
+              placeholder="https://example.com"
+            />
+            <p class="error" id="error" role="alert" hidden></p>
+
+            <div class="shape">
+              <label class="label shape__label" for="shape">Forma de módulos</label>
+              <select class="select" id="shape">
+                <option value="square">Cuadrados</option>
+                <option value="circle">Círculos</option>
+              </select>
+            </div>
+
+            <div class="colors">
+              <div class="color">
+                <label class="label color__label" for="dark">Módulos</label>
+                <input class="color__input" id="dark" type="color" value="#ededed" />
+              </div>
+              <div class="color">
+                <label class="label color__label" for="light">Fondo</label>
+                <input class="color__input" id="light" type="color" value="#0f0f0f" />
+              </div>
+            </div>
+
+            <div class="logo">
+              <label class="label">Imagen central</label>
+              <div class="logo__row">
+                <img class="logo__preview" id="logo-preview" alt="" hidden />
+                <button class="button button--secondary" id="logo-pick" type="button">Subir imagen</button>
+                <button class="button button--secondary" id="logo-remove" type="button" hidden>Quitar</button>
+              </div>
+              <input class="visually-hidden" id="logo-input" type="file" accept="image/*" />
+            </div>
+
+            <button class="button" type="submit">Generar QR</button>
           </div>
 
-          <div class="colors">
-            <div class="color">
-              <label class="label color__label" for="dark">Módulos</label>
-              <input class="color__input" id="dark" type="color" value="#ededed" />
+          <div class="output">
+            <div class="output__frame">
+              <div class="output__svg" id="svg-host" hidden aria-hidden="true"></div>
+              <canvas class="output__canvas" id="canvas" width="512" height="512" hidden></canvas>
             </div>
-            <div class="color">
-              <label class="label color__label" for="light">Fondo</label>
-              <input class="color__input" id="light" type="color" value="#0f0f0f" />
-            </div>
+            <button class="button button--secondary" id="download" type="button" hidden>Descargar JPG</button>
           </div>
+        </form>
+      </section>
 
-          <div class="logo">
-            <label class="label">Imagen central</label>
-            <div class="logo__row">
-              <img class="logo__preview" id="logo-preview" alt="" hidden />
-              <button class="button button--secondary" id="logo-pick" type="button">Subir imagen</button>
-              <button class="button button--secondary" id="logo-remove" type="button" hidden>Quitar</button>
+      <section class="view" id="view-card" hidden>
+        <div class="maker">
+          <form class="maker__form" id="card-form" novalidate>
+            <div class="field">
+              <label class="label" for="c-name">Nombre</label>
+              <input class="input" id="c-name" type="text" maxlength="60" autocomplete="name" />
             </div>
-            <input class="visually-hidden" id="logo-input" type="file" accept="image/*" />
-          </div>
+            <div class="field">
+              <label class="label" for="c-last">Apellidos</label>
+              <input class="input" id="c-last" type="text" maxlength="60" autocomplete="family-name" />
+            </div>
+            <div class="field">
+              <label class="label" for="c-role">Profesión</label>
+              <input class="input" id="c-role" type="text" maxlength="60" />
+            </div>
+            <div class="field">
+              <label class="label" for="c-desc">Descripción breve</label>
+              <input class="input" id="c-desc" type="text" maxlength="120" placeholder="Una frase corta" />
+            </div>
+            <div class="field">
+              <label class="label" for="c-email">Correo</label>
+              <input class="input" id="c-email" type="email" autocomplete="email" />
+            </div>
+            <div class="field">
+              <label class="label" for="c-phone">Teléfono (opcional)</label>
+              <input class="input" id="c-phone" type="tel" autocomplete="tel" />
+            </div>
+            <div class="field">
+              <label class="label" for="c-web">Web / Portfolio</label>
+              <input class="input" id="c-web" type="text" inputmode="url" placeholder="https://" />
+            </div>
+            <div class="field">
+              <label class="label" for="c-li">LinkedIn (opcional)</label>
+              <input class="input" id="c-li" type="text" inputmode="url" placeholder="https://linkedin.com/in/..." />
+            </div>
+            <div class="field">
+              <label class="label" for="c-ig">Instagram (opcional)</label>
+              <input class="input" id="c-ig" type="text" inputmode="url" placeholder="https://instagram.com/..." />
+            </div>
+            <div class="field">
+              <label class="label" for="c-x">X / Twitter (opcional)</label>
+              <input class="input" id="c-x" type="text" inputmode="url" placeholder="https://x.com/..." />
+            </div>
+            <div class="field">
+              <label class="label" for="c-photo">Foto · URL (opcional)</label>
+              <input class="input" id="c-photo" type="text" inputmode="url" placeholder="https://" />
+            </div>
 
-          <button class="button" type="submit">Generar QR</button>
+            <div class="colors">
+              <div class="color">
+                <label class="label color__label" for="c-bg">Fondo</label>
+                <input class="color__input" id="c-bg" type="color" value="#171717" />
+              </div>
+              <div class="color">
+                <label class="label color__label" for="c-fg">Texto</label>
+                <input class="color__input" id="c-fg" type="color" value="#ededed" />
+              </div>
+            </div>
+
+            <p class="error" id="card-error" role="alert" hidden></p>
+
+            <div class="maker__actions">
+              <button class="button" type="submit">Generar QR</button>
+              <button class="button button--secondary" id="card-copy" type="button">Copiar enlace</button>
+            </div>
+          </form>
+
+          <div class="maker__preview">
+            <div class="biz-card-slot" id="card-preview"></div>
+
+            <div class="output__frame output__frame--card">
+              <div class="output__svg" id="card-svg-host" hidden aria-hidden="true"></div>
+              <canvas class="output__canvas" id="card-canvas" width="512" height="512" hidden></canvas>
+            </div>
+            <button class="button button--secondary" id="card-download" type="button" hidden>Descargar QR</button>
+          </div>
         </div>
+      </section>
 
-        <div class="output">
-          <div class="output__frame">
-            <div class="output__svg" id="svg-host" hidden aria-hidden="true"></div>
-            <canvas class="output__canvas" id="canvas" width="512" height="512" hidden></canvas>
-          </div>
-          <button class="button button--secondary" id="download" type="button" hidden>Descargar JPG</button>
+      <section class="view view--viewer" id="view-viewer" hidden>
+        <div class="biz-card-slot" id="viewer-card"></div>
+        <div class="viewer__actions">
+          <button class="button" id="viewer-vcf" type="button">Descargar contacto (.vcf)</button>
+          <button class="button button--secondary" id="viewer-home" type="button">Crear mi tarjeta</button>
         </div>
-      </form>
+      </section>
     </main>
 
     <div class="modal" id="editor" hidden>

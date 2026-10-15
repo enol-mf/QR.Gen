@@ -280,6 +280,194 @@ body {
   display: block;
 }
 
+.tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 24px;
+  padding: 4px;
+  background: var(--background);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+
+.tab {
+  flex: 1;
+  padding: 10px 12px;
+  font: inherit;
+  font-weight: 500;
+  color: var(--text-muted);
+  background: transparent;
+  border: 0;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.tab:hover {
+  color: var(--text);
+}
+
+.tab.is-active {
+  color: var(--text);
+  background: var(--surface-raised);
+}
+
+.maker {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 300px;
+  gap: 32px;
+  align-items: start;
+}
+
+.maker__form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+}
+
+.field .label {
+  margin-bottom: 6px;
+}
+
+.maker__preview {
+  position: sticky;
+  top: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.maker__actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.maker__actions .button {
+  flex: 1;
+}
+
+.output__frame--card {
+  width: 260px;
+  height: 260px;
+}
+
+.biz-card-slot {
+  width: 100%;
+  max-width: 320px;
+}
+
+.biz-card {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1.6 / 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 18px;
+  overflow: hidden;
+  color: var(--card-fg, #ededed);
+  background: var(--card-bg, #171717);
+  border: 1px solid color-mix(in srgb, var(--card-fg, #ededed) 16%, transparent);
+  border-radius: 14px;
+}
+
+.biz-card__top {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.biz-card__photo {
+  flex: 0 0 auto;
+  width: 46px;
+  height: 46px;
+  object-fit: cover;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--card-fg, #ededed) 12%, transparent);
+}
+
+.biz-card__id {
+  min-width: 0;
+}
+
+.biz-card__name {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.biz-card__role {
+  margin: 2px 0 0;
+  font-size: 13px;
+  opacity: 0.75;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.biz-card__desc {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.4;
+  opacity: 0.85;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.biz-card__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: auto 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.biz-card__links a {
+  display: inline-block;
+  padding: 4px 10px;
+  font-size: 12px;
+  color: inherit;
+  text-decoration: none;
+  background: color-mix(in srgb, var(--card-fg, #ededed) 12%, transparent);
+  border-radius: 999px;
+}
+
+.biz-card__links a:hover {
+  background: color-mix(in srgb, var(--card-fg, #ededed) 22%, transparent);
+}
+
+.view--viewer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+}
+
+.view--viewer .biz-card-slot {
+  max-width: 400px;
+}
+
+.viewer__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+}
+
 @media (max-width: 620px) {
   .card {
     padding: 24px;
@@ -288,5 +476,15 @@ body {
   .form {
     grid-template-columns: minmax(0, 1fr);
     gap: 24px;
+  }
+
+  .maker {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 24px;
+  }
+
+  .maker__preview {
+    position: static;
+    order: -1;
   }
 }
