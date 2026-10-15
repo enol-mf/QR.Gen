@@ -10,9 +10,24 @@ const shapeInput = document.getElementById('shape');
 const svgHost = document.getElementById('svg-host');
 const canvas = document.getElementById('canvas');
 const download = document.getElementById('download');
+const logoPick = document.getElementById('logo-pick');
+const logoInput = document.getElementById('logo-input');
+const logoRemove = document.getElementById('logo-remove');
+const logoPreview = document.getElementById('logo-preview');
+const editor = document.getElementById('editor');
+const editorViewport = document.getElementById('editor-viewport');
+const editorImage = document.getElementById('editor-image');
+const editorZoom = document.getElementById('editor-zoom');
+const editorApply = document.getElementById('editor-apply');
+const editorCancel = document.getElementById('editor-cancel');
 
 const QR_SIZE = 512;
-const MODULE_MARGIN = 1; // para evitar artefactos al rasterizar
+const MODULE_MARGIN = 4; // zona de silencio recomendada por el estándar QR
+const LOGO_RATIO = 0.22; // proporción del QR que ocupa la imagen central
+const LOGO_OUTPUT = 256; // resolución del recorte exportado
+
+let logoDataURL = '';
+let currentText = '';
 
 function showError(message) {
   error.textContent = message;
@@ -62,34 +77,20 @@ function downloadJPG() {
 }
 
 function shapePath(shape, cx, cy, r) {
-  const rr = r * 0.9;
+  const rr = r;
   switch (shape) {
     case 'circle':
       return `<circle cx="${cx}" cy="${cy}" r="${rr / 2}"/>`;
-    case 'diamond':
-      return `<polygon points="${cx},${cy - rr / 2} ${cx + rr / 2},${cy} ${cx},${cy + rr / 2} ${cx - rr / 2},${cy}"/>`;
-    case 'triangle':
-      return `<polygon points="${cx},${cy - rr / 2} ${cx + rr / 2},${cy + rr / 2} ${cx - rr / 2},${cy + rr / 2}"/>`;
-    case 'heart': {
-      const k = rr / 100;
-      const x = cx - rr / 2;
-      const y = cy - rr / 2;
-      const p = (px, py) => `${(x + px * k).toFixed(2)},${(y + py * k).toFixed(2)}`;
-      return `<path d="M ${p(50, 96)} C ${p(22, 74)} ${p(4, 56)} ${p(4, 34)} C ${p(4, 17)} ${p(17, 6)} ${p(31, 6)} C ${p(41, 6)} ${p(47, 12)} ${p(50, 20)} C ${p(53, 12)} ${p(59, 6)} ${p(69, 6)} C ${p(83, 6)} ${p(96, 17)} ${p(96, 34)} C ${p(96, 56)} ${p(78, 74)} ${p(50, 96)} Z"/>`;
-    }
-    case 'spade': {
-      const s = rr / 2.8;
-      return `<path d="M ${cx},${cy - s * 1.2} L ${cx + s * 0.8},${cy - s * 0.1} L ${cx + s * 1.2},${cy + s * 0.2} L ${cx + s * 0.1},${cy + s * 0.8} L ${cx},${cy + s * 1.2} L ${cx - s * 0.1},${cy + s * 0.8} L ${cx - s * 1.2},${cy + s * 0.2} L ${cx - s * 0.8},${cy - s * 0.1} Z M ${cx - s * 0.3},${cy + s * 0.8} H ${cx + s * 0.3} L ${cx},${cy + s * 1.5} Z"/>`;
-    }
     default:
       return `<rect x="${cx - rr / 2}" y="${cy - rr / 2}" width="${rr}" height="${rr}"/>`;
   }
 }
 
 function renderQR(text) {
+  const logo = logoDataURL;
   Promise.resolve().then(() =>
     QRCode.create(text, {
-      errorCorrectionLevel: 'M',
+      errorCorrectionLevel: logo ? 'H' : 'Q',
       version: undefined,
     })
   )
@@ -112,7 +113,18 @@ function renderQR(text) {
         shapes += shapePath(shape, cx, cy, moduleSize);
       }
 
-      const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${QR_SIZE}" height="${QR_SIZE}" viewBox="0 0 ${QR_SIZE} ${QR_SIZE}" shape-rendering="geometricPrecision"><rect x="0" y="0" width="${QR_SIZE}" height="${QR_SIZE}" fill="${light}"/><g fill="${dark}">${shapes}</g></svg>`;
+      let overlay = '';
+      if (logo) {
+        const logoSize = QR_SIZE * LOGO_RATIO;
+        const pad = moduleSize;
+        const box = logoSize / 2 + pad;
+        const center = QR_SIZE / 2;
+        overlay =
+          `<rect x="${center - box}" y="${center - box}" width="${box * 2}" height="${box * 2}" rx="${pad * 1.5}" fill="${light}"/>` +
+          `<image x="${center - logoSize / 2}" y="${center - logoSize / 2}" width="${logoSize}" height="${logoSize}" preserveAspectRatio="xMidYMid slice" href="${logo}"/>`;
+      }
+
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${QR_SIZE}" height="${QR_SIZE}" viewBox="0 0 ${QR_SIZE} ${QR_SIZE}" shape-rendering="geometricPrecision"><rect x="0" y="0" width="${QR_SIZE}" height="${QR_SIZE}" fill="${light}"/><g fill="${dark}">${shapes}</g>${overlay}</svg>`;
       svgHost.innerHTML = svg;
       svgHost.hidden = false;
       download.hidden = false;
@@ -142,7 +154,145 @@ form.addEventListener('submit', (event) => {
   }
 
   clearError();
+  currentText = text;
   renderQR(text);
+});
+
+let imgWidth = 0;
+let imgHeight = 0;
+let baseScale = 1;
+let zoom = 1;
+let posX = 0;
+let posY = 0;
+let dragging = false;
+let dragStartX = 0;
+let dragStartY = 0;
+let dragPosX = 0;
+let dragPosY = 0;
+
+function applyTransform() {
+  editorImage.style.transform = `translate(${posX}px, ${posY}px) scale(${baseScale * zoom})`;
+}
+
+function clampPosition() {
+  const view = editorViewport.clientWidth;
+  const scale = baseScale * zoom;
+  const width = imgWidth * scale;
+  const height = imgHeight * scale;
+  posX = Math.min(0, Math.max(view - width, posX));
+  posY = Math.min(0, Math.max(view - height, posY));
+}
+
+function openEditor(dataUrl) {
+  editor.hidden = false;
+  editorImage.onload = () => {
+    imgWidth = editorImage.naturalWidth;
+    imgHeight = editorImage.naturalHeight;
+    const view = editorViewport.clientWidth;
+    baseScale = Math.max(view / imgWidth, view / imgHeight);
+    zoom = 1;
+    editorZoom.value = '1';
+    const scale = baseScale;
+    posX = (view - imgWidth * scale) / 2;
+    posY = (view - imgHeight * scale) / 2;
+    applyTransform();
+  };
+  editorImage.src = dataUrl;
+}
+
+function onZoom() {
+  const view = editorViewport.clientWidth;
+  const oldScale = baseScale * zoom;
+  const centerX = (view / 2 - posX) / oldScale;
+  const centerY = (view / 2 - posY) / oldScale;
+  zoom = Number(editorZoom.value);
+  const scale = baseScale * zoom;
+  posX = view / 2 - centerX * scale;
+  posY = view / 2 - centerY * scale;
+  clampPosition();
+  applyTransform();
+}
+
+function applyLogo() {
+  const view = editorViewport.clientWidth;
+  const scale = baseScale * zoom;
+  const out = document.createElement('canvas');
+  out.width = LOGO_OUTPUT;
+  out.height = LOGO_OUTPUT;
+  const ctx = out.getContext('2d');
+  const ratio = LOGO_OUTPUT / view;
+  ctx.drawImage(editorImage, posX * ratio, posY * ratio, imgWidth * scale * ratio, imgHeight * scale * ratio);
+  logoDataURL = out.toDataURL('image/jpeg', 0.92);
+  logoPreview.src = logoDataURL;
+  logoPreview.hidden = false;
+  logoRemove.hidden = false;
+  editor.hidden = true;
+  if (currentText) renderQR(currentText);
+}
+
+function closeEditor() {
+  editor.hidden = true;
+  editorImage.removeAttribute('src');
+}
+
+logoPick.addEventListener('click', () => logoInput.click());
+
+logoInput.addEventListener('change', () => {
+  const file = logoInput.files && logoInput.files[0];
+  logoInput.value = '';
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => openEditor(reader.result);
+  reader.readAsDataURL(file);
+});
+
+logoRemove.addEventListener('click', () => {
+  logoDataURL = '';
+  logoPreview.hidden = true;
+  logoPreview.removeAttribute('src');
+  logoRemove.hidden = true;
+  if (currentText) renderQR(currentText);
+});
+
+editorZoom.addEventListener('input', onZoom);
+
+editorViewport.addEventListener('pointerdown', (event) => {
+  dragging = true;
+  dragStartX = event.clientX;
+  dragStartY = event.clientY;
+  dragPosX = posX;
+  dragPosY = posY;
+  editorViewport.setPointerCapture(event.pointerId);
+});
+
+editorViewport.addEventListener('pointermove', (event) => {
+  if (!dragging) return;
+  posX = dragPosX + (event.clientX - dragStartX);
+  posY = dragPosY + (event.clientY - dragStartY);
+  clampPosition();
+  applyTransform();
+});
+
+function endDrag(event) {
+  if (!dragging) return;
+  dragging = false;
+  if (editorViewport.hasPointerCapture(event.pointerId)) {
+    editorViewport.releasePointerCapture(event.pointerId);
+  }
+}
+
+editorViewport.addEventListener('pointerup', endDrag);
+editorViewport.addEventListener('pointercancel', endDrag);
+
+editorApply.addEventListener('click', applyLogo);
+editorCancel.addEventListener('click', closeEditor);
+
+editor.addEventListener('click', (event) => {
+  if (event.target === editor) closeEditor();
+});
+
+document.addEventListener('keydown', (event) => {
+  if (event.key === 'Escape' && !editor.hidden) closeEditor();
 });
 
 download.addEventListener('click', downloadJPG);

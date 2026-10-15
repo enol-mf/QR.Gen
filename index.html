@@ -31,10 +31,6 @@
             <select class="select" id="shape">
               <option value="square">Cuadrados</option>
               <option value="circle">Círculos</option>
-              <option value="diamond">Rombos</option>
-              <option value="triangle">Triángulos</option>
-              <option value="heart">Corazones</option>
-              <option value="spade">Picas</option>
             </select>
           </div>
 
@@ -49,6 +45,16 @@
             </div>
           </div>
 
+          <div class="logo">
+            <label class="label">Imagen central</label>
+            <div class="logo__row">
+              <img class="logo__preview" id="logo-preview" alt="" hidden />
+              <button class="button button--secondary" id="logo-pick" type="button">Subir imagen</button>
+              <button class="button button--secondary" id="logo-remove" type="button" hidden>Quitar</button>
+            </div>
+            <input class="visually-hidden" id="logo-input" type="file" accept="image/*" />
+          </div>
+
           <button class="button" type="submit">Generar QR</button>
         </div>
 
@@ -61,6 +67,24 @@
         </div>
       </form>
     </main>
+
+    <div class="modal" id="editor" hidden>
+      <div class="modal__panel" role="dialog" aria-modal="true" aria-labelledby="editor-title">
+        <h2 class="modal__title" id="editor-title">Ajustar imagen</h2>
+        <p class="modal__hint">Arrastra para encuadrar y usa el zoom para acercar.</p>
+        <div class="editor" id="editor-viewport">
+          <img class="editor__image" id="editor-image" alt="" draggable="false" />
+        </div>
+        <div class="editor__zoom">
+          <label class="label" for="editor-zoom">Zoom</label>
+          <input id="editor-zoom" type="range" min="1" max="4" step="0.01" value="1" />
+        </div>
+        <div class="modal__actions">
+          <button class="button button--secondary" id="editor-cancel" type="button">Cancelar</button>
+          <button class="button" id="editor-apply" type="button">Aplicar</button>
+        </div>
+      </div>
+    </div>
 
     <script src="./script.js"></script>
   </body>
