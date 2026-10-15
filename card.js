@@ -77,36 +77,6 @@ export function buildCardUrl(card) {
   return `${base}#${encodeCard(card)}`;
 }
 
-export function contactFileName(card) {
-  const base = [card.name, card.last].filter(Boolean).join('-') || 'contacto';
-  return `${base.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'contacto'}.vcf`;
-}
-
-function escapeVCard(value) {
-  return String(value == null ? '' : value)
-    .replace(/\\/g, '\\\\')
-    .replace(/\r?\n/g, '\\n')
-    .replace(/,/g, '\\,')
-    .replace(/;/g, '\\;');
-}
-
-export function buildVCard(card) {
-  const lines = ['BEGIN:VCARD', 'VERSION:3.0'];
-  lines.push(`N:${escapeVCard(card.last)};${escapeVCard(card.name)};;;`);
-  lines.push(`FN:${escapeVCard([card.name, card.last].filter(Boolean).join(' '))}`);
-  if (card.role) lines.push(`TITLE:${escapeVCard(card.role)}`);
-  if (card.phone) lines.push(`TEL;TYPE=CELL:${escapeVCard(card.phone)}`);
-  if (card.email) lines.push(`EMAIL;TYPE=INTERNET:${escapeVCard(card.email)}`);
-  if (card.web) lines.push(`URL:${escapeVCard(card.web)}`);
-  if (card.linkedin) lines.push(`X-SOCIALPROFILE;TYPE=linkedin:${escapeVCard(card.linkedin)}`);
-  if (card.instagram) lines.push(`X-SOCIALPROFILE;TYPE=instagram:${escapeVCard(card.instagram)}`);
-  if (card.x) lines.push(`X-SOCIALPROFILE;TYPE=twitter:${escapeVCard(card.x)}`);
-  if (card.photo) lines.push(`PHOTO;VALUE=URI:${escapeVCard(card.photo)}`);
-  if (card.desc) lines.push(`NOTE:${escapeVCard(card.desc)}`);
-  lines.push('END:VCARD');
-  return `${lines.join('\r\n')}\r\n`;
-}
-
 export function renderCard(card) {
   const el = document.createElement('article');
   el.className = 'biz-card';

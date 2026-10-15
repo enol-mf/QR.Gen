@@ -6,8 +6,6 @@ import {
   buildCardUrl,
   decodeCard,
   hasCardData,
-  buildVCard,
-  contactFileName,
   renderCard,
 } from './card.js';
 
@@ -32,6 +30,7 @@ import {
   const editorApply = document.getElementById('editor-apply');
   const editorCancel = document.getElementById('editor-cancel');
   const tabs = document.getElementById('tabs');
+  const appTitle = document.getElementById('app-title');
   const views = {
     qr: document.getElementById('view-qr'),
     card: document.getElementById('view-card'),
@@ -42,10 +41,8 @@ import {
   const cardSvgHost = document.getElementById('card-svg-host');
   const cardCanvas = document.getElementById('card-canvas');
   const cardDownload = document.getElementById('card-download');
-  const cardCopy = document.getElementById('card-copy');
   const cardError = document.getElementById('card-error');
   const viewerCard = document.getElementById('viewer-card');
-  const viewerVcf = document.getElementById('viewer-vcf');
   const viewerHome = document.getElementById('viewer-home');
   const cardFields = {
     name: document.getElementById('c-name'),
@@ -71,7 +68,6 @@ import {
 
   let logoDataURL = '';
   let currentText = '';
-  let cardUrl = '';
 
   function showError(message) {
     error.textContent = message;
@@ -375,7 +371,9 @@ import {
   });
 
   function showView(name) {
-    tabs.hidden = name === 'viewer';
+    const viewerOnly = name === 'viewer';
+    tabs.hidden = viewerOnly;
+    appTitle.hidden = viewerOnly;
     Object.entries(views).forEach(([key, section]) => {
       section.hidden = key !== name;
     });
@@ -458,7 +456,6 @@ import {
       const svg = buildQrSvg(url, { ecc: 'M', shape: 'square', dark: '#000000', light: '#ffffff' });
       renderSvg(svg, cardSvgHost);
       cardDownload.hidden = false;
-      cardUrl = url;
       clearCardError();
     } catch (e) {
       cardSvgHost.hidden = true;
@@ -473,41 +470,9 @@ import {
     downloadImage(svg, '#ffffff', cardCanvas, 'tarjeta-qr.png', 'image/png');
   });
 
-  cardCopy.addEventListener('click', () => {
-    if (!cardUrl) {
-      showCardError('Genera primero el QR para obtener el enlace.');
-      return;
-    }
-    const label = cardCopy.textContent;
-    const done = () => {
-      cardCopy.textContent = 'Enlace copiado';
-      setTimeout(() => {
-        cardCopy.textContent = label;
-      }, 1500);
-    };
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(cardUrl).then(done).catch(() => {
-        showCardError('No se ha podido copiar el enlace.');
-      });
-    } else {
-      showCardError('No se ha podido copiar el enlace.');
-    }
-  });
-
-  function startVCardDownload(card) {
-    const blob = new Blob([buildVCard(card)], { type: 'text/vcard;charset=utf-8' });
-    const objectUrl = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = objectUrl;
-    link.download = contactFileName(card);
-    link.click();
-    URL.revokeObjectURL(objectUrl);
-  }
-
   function showViewer(card) {
     showView('viewer');
     viewerCard.replaceChildren(renderCard(card));
-    viewerVcf.onclick = () => startVCardDownload(card);
   }
 
   tabs.addEventListener('click', (event) => {
