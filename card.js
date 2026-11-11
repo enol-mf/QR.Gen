@@ -6,6 +6,7 @@ const PARAM = {
   email: 'e',
   phone: 't',
   web: 'w',
+  github: 'g',
   linkedin: 'li',
   instagram: 'ig',
   x: 'x',
@@ -18,6 +19,7 @@ const HEX_COLORS = ['bg', 'fg'];
 
 const LABELS = {
   web: 'la web',
+  github: 'GitHub',
   linkedin: 'LinkedIn',
   instagram: 'Instagram',
   x: 'X',
@@ -125,6 +127,7 @@ export function renderCard(card, qrSvg) {
   if (card.email) links.push(['Email', `mailto:${card.email}`]);
   if (card.phone) links.push(['Teléfono', `tel:${card.phone.replace(/[^+\d]/g, '')}`]);
   if (card.web) links.push(['Web', card.web]);
+  if (card.github) links.push(['GitHub', card.github]);
   if (card.linkedin) links.push(['LinkedIn', card.linkedin]);
   if (card.instagram) links.push(['Instagram', card.instagram]);
   if (card.x) links.push(['X', card.x]);

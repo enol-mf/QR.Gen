@@ -52,6 +52,7 @@ import {
     email: document.getElementById('c-email'),
     phone: document.getElementById('c-phone'),
     web: document.getElementById('c-web'),
+    github: document.getElementById('c-gh'),
     linkedin: document.getElementById('c-li'),
     instagram: document.getElementById('c-ig'),
     x: document.getElementById('c-x'),
@@ -408,7 +409,7 @@ import {
       fg: raw.fg,
     };
 
-    const urlKeys = ['web', 'linkedin', 'instagram', 'x', 'photo'];
+    const urlKeys = ['web', 'github', 'linkedin', 'instagram', 'x', 'photo'];
     for (let i = 0; i < urlKeys.length; i++) {
       const key = urlKeys[i];
       if (!raw[key]) continue;
