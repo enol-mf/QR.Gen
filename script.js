@@ -15,8 +15,10 @@ import {
   const error = document.getElementById('error');
   const darkInput = document.getElementById('dark');
   const lightInput = document.getElementById('light');
+  const lightTransparent = document.getElementById('light-transparent');
   const shapeInput = document.getElementById('shape');
   const svgHost = document.getElementById('svg-host');
+  const svgFrame = svgHost.closest('.output__frame');
   const canvas = document.getElementById('canvas');
   const download = document.getElementById('download');
   const logoPick = document.getElementById('logo-pick');
@@ -39,6 +41,8 @@ import {
   const cardForm = document.getElementById('card-form');
   const cardPreview = document.getElementById('card-preview');
   const cardSvgHost = document.getElementById('card-svg-host');
+  const cardSvgFrame = cardSvgHost.closest('.output__frame');
+  const cardTransparent = document.getElementById('card-bg-transparent');
   const cardCanvas = document.getElementById('card-canvas');
   const cardDownload = document.getElementById('card-download');
   const cardError = document.getElementById('card-error');
@@ -127,6 +131,7 @@ import {
         shape: 'square',
         ecc: 'Q',
         logo: '',
+        transparent: false,
       },
       options
     );
@@ -153,12 +158,17 @@ import {
       const pad = moduleSize;
       const box = logoSize / 2 + pad;
       const center = opts.size / 2;
+      const logoBackground = opts.transparent ? '#ffffff' : opts.light;
       overlay =
-        `<rect x="${center - box}" y="${center - box}" width="${box * 2}" height="${box * 2}" rx="${pad * 1.5}" fill="${opts.light}"/>` +
+        `<rect x="${center - box}" y="${center - box}" width="${box * 2}" height="${box * 2}" rx="${pad * 1.5}" fill="${logoBackground}"/>` +
         `<image x="${center - logoSize / 2}" y="${center - logoSize / 2}" width="${logoSize}" height="${logoSize}" preserveAspectRatio="xMidYMid slice" href="${opts.logo}"/>`;
     }
 
-    return `<svg xmlns="http://www.w3.org/2000/svg" width="${opts.size}" height="${opts.size}" viewBox="0 0 ${opts.size} ${opts.size}" shape-rendering="geometricPrecision"><rect x="0" y="0" width="${opts.size}" height="${opts.size}" fill="${opts.light}"/><g fill="${opts.dark}">${shapes}</g>${overlay}</svg>`;
+    const background = opts.transparent
+      ? ''
+      : `<rect x="0" y="0" width="${opts.size}" height="${opts.size}" fill="${opts.light}"/>`;
+
+    return `<svg xmlns="http://www.w3.org/2000/svg" width="${opts.size}" height="${opts.size}" viewBox="0 0 ${opts.size} ${opts.size}" shape-rendering="geometricPrecision">${background}<g fill="${opts.dark}">${shapes}</g>${overlay}</svg>`;
   }
 
   function renderSvg(svg, host) {
@@ -170,11 +180,13 @@ import {
     return new Promise((resolve) => {
       const img = new Image();
       img.onload = () => {
-        const ctx = targetCanvas.getContext('2d');
         targetCanvas.width = QR_SIZE;
         targetCanvas.height = QR_SIZE;
-        ctx.fillStyle = background;
-        ctx.fillRect(0, 0, QR_SIZE, QR_SIZE);
+        const ctx = targetCanvas.getContext('2d');
+        if (background) {
+          ctx.fillStyle = background;
+          ctx.fillRect(0, 0, QR_SIZE, QR_SIZE);
+        }
         ctx.drawImage(img, 0, 0, QR_SIZE, QR_SIZE);
         resolve(targetCanvas.toDataURL(type, 0.92));
       };
@@ -193,6 +205,12 @@ import {
     });
   }
 
+  function updateGeneratorTransparency() {
+    const transparent = lightTransparent.checked;
+    lightInput.disabled = transparent;
+    if (svgFrame) svgFrame.classList.toggle('is-transparent', transparent);
+  }
+
   function renderGeneratorQr() {
     try {
       const svg = buildQrSvg(currentText, {
@@ -201,6 +219,7 @@ import {
         shape: shapeInput.value,
         ecc: logoDataURL ? 'H' : 'Q',
         logo: logoDataURL,
+        transparent: lightTransparent.checked,
       });
       renderSvg(svg, svgHost);
       download.hidden = false;
@@ -217,10 +236,15 @@ import {
   function downloadPng() {
     const svg = svgHost.innerHTML;
     if (!svg) return;
-    downloadImage(svg, lightInput.value, canvas, fileName(), 'image/png');
+    const background = lightTransparent.checked ? null : lightInput.value;
+    downloadImage(svg, background, canvas, fileName(), 'image/png');
   }
 
   download.addEventListener('click', downloadPng);
+  lightTransparent.addEventListener('change', () => {
+    updateGeneratorTransparency();
+    if (currentText) renderGeneratorQr();
+  });
 
   form.addEventListener('submit', (event) => {
     event.preventDefault();
@@ -433,7 +457,7 @@ import {
     return { card };
   }
 
-  function cardQrSvg(card) {
+  function cardQrSvg(card, transparent) {
     try {
       const url = buildCardUrl(card);
       if (url.length > MAX_CARD_URL) return '';
@@ -444,19 +468,28 @@ import {
         ecc: 'M',
         dark: card.fg || '#ededed',
         light: card.bg || '#171717',
+        transparent,
       });
     } catch (e) {
       return '';
     }
   }
 
+  function updateCardTransparency() {
+    if (cardSvgFrame) cardSvgFrame.classList.toggle('is-transparent', cardTransparent.checked);
+  }
+
   function updateCardPreview() {
     const result = collectCard(false);
     if (result.error) return;
-    cardPreview.replaceChildren(renderCard(result.card, cardQrSvg(result.card)));
+    cardPreview.replaceChildren(renderCard(result.card, cardQrSvg(result.card, cardTransparent.checked)));
   }
 
   cardForm.addEventListener('input', updateCardPreview);
+  cardTransparent.addEventListener('change', () => {
+    updateCardTransparency();
+    if (!cardSvgHost.hidden) cardForm.requestSubmit();
+  });
 
   cardForm.addEventListener('submit', (event) => {
     event.preventDefault();
@@ -476,7 +509,13 @@ import {
     try {
       const light = result.card.bg || '#171717';
       const dark = result.card.fg || '#ededed';
-      const svg = buildQrSvg(url, { ecc: 'M', shape: 'square', dark, light });
+      const svg = buildQrSvg(url, {
+        ecc: 'M',
+        shape: 'square',
+        dark,
+        light,
+        transparent: cardTransparent.checked,
+      });
       renderSvg(svg, cardSvgHost);
       cardQrLight = light;
       cardDownload.hidden = false;
@@ -491,12 +530,13 @@ import {
   cardDownload.addEventListener('click', () => {
     const svg = cardSvgHost.innerHTML;
     if (!svg) return;
-    downloadImage(svg, cardQrLight, cardCanvas, 'tarjeta-qr.png', 'image/png');
+    const background = cardTransparent.checked ? null : cardQrLight;
+    downloadImage(svg, background, cardCanvas, 'tarjeta-qr.png', 'image/png');
   });
 
   function showViewer(card) {
     showView('viewer');
-    viewerCard.replaceChildren(renderCard(card, cardQrSvg(card)));
+    viewerCard.replaceChildren(renderCard(card, cardQrSvg(card, false)));
   }
 
   tabs.addEventListener('click', (event) => {
@@ -520,6 +560,8 @@ import {
     showView('qr');
   }
 
+  updateGeneratorTransparency();
+  updateCardTransparency();
   updateCardPreview();
   init();
 })();
