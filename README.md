@@ -1,44 +1,92 @@
 # QR.Gen
 
-Generador de códigos QR a partir de una URL. Todo el procesamiento ocurre en el navegador: las URLs no se envían a ningún servidor ni se almacenan.
+Aplicación web para crear códigos QR personalizados y tarjetas de visita digitales, sin necesidad de registrarse ni instalar nada.
 
-## Link
+**[Probar QR.Gen](https://qrgent.vercel.app/)**
 
-https://qrgent.vercel.app/
+## Funcionalidades
 
-## Funcionalidad
+### Generador de códigos QR
 
-1. Campo para introducir la URL y botón `Generar QR` (también con `Enter`).
-2. Selector de color para los módulos y para el fondo. Los cambios se aplican al pulsar `Generar QR`.
-3. Botón `Descargar JPG` para guardar el código generado.
+- Generación de códigos QR a partir de cualquier URL.
+- Personalización de la forma de los módulos: cuadrados o círculos.
+- Selección de colores para el código y el fondo.
+- Posibilidad de añadir una imagen o logotipo en el centro.
+- Editor de imagen integrado para ajustar el encuadre y el zoom.
+- Descarga del código QR en formato PNG.
 
-## Requisitos
+### Tarjetas personales digitales
 
-Node.js 18 o superior.
+- Creación de tarjetas de visita digitales personalizadas.
+- Campos para nombre, apellidos, profesión y descripción.
+- Información de contacto: correo electrónico y teléfono.
+- Enlaces a portfolio, LinkedIn, Instagram y X.
+- Personalización de colores y fotografía.
+- Generación de un código QR para compartir la tarjeta.
+- Acceso a la tarjeta mediante un enlace compartible.
 
-## Comandos
+## Tecnologías utilizadas
+
+- HTML5
+- CSS3
+- JavaScript
+- [QRCode](https://www.npmjs.com/package/qrcode): generación de códigos QR.
+- [esbuild](https://esbuild.github.io/): empaquetado y optimización del proyecto.
+- Vercel: despliegue y hosting.
+
+## Instalación y ejecución
+
+Requisitos: Node.js 18 o superior.
+
+Clona el repositorio:
 
 ```bash
-npm install
-npm run dev    # servidor local en http://127.0.0.1:8000
-npm run build  # genera la web estática en dist/
+git clone https://github.com/enol-mf/QR.Gen.git
+cd QR.Gen
 ```
 
-Importante: el `index.html` de la raíz es el código fuente y **no funciona si se abre directamente** en el navegador, porque `script.js` importa la librería `qrcode` y necesita estar empaquetada. Para probarlo en local, o bien `npm run dev` y abrir http://127.0.0.1:8000, o bien `npm run build` y abrir `dist/index.html`.
+Instala las dependencias:
+```bash
+npm install
+```
 
-## Estructura
+Inicia el servidor de desarrollo:
+```bash
+npm run dev
+```
 
-```text
-/
+Abre en el navegador la dirección:
+```bash
+http://127.0.0.1:8000
+```
+
+Para generar la versión de producción:
+```bash
+npm run build
+```
+
+Los archivos optimizados se generan en el directorio dist/.
+Estructura del proyecto
+```bash
+QR.Gen/
 ├── index.html
 ├── style.css
 ├── script.js
+├── card.js
+├── icon.png
 ├── package.json
-└── vercel.json
+├── package-lock.json
+├── vercel.json
+└── README.md
 ```
 
-`script.js` usa la librería [qrcode](https://github.com/soldair/node-qrcode). El build con esbuild empaqueta esa dependencia en `dist/` para que no haga falta ningún backend.
+Privacidad
+La generación de códigos QR y el procesamiento de las tarjetas se realizan en el navegador, sin necesidad de un backend.
 
-## Despliegue en Vercel
+Los datos de las tarjetas se codifican en el fragmento de la URL para permitir compartirlas mediante un enlace.
 
-`vercel.json` ya define `npm run build` como comando de build y `dist` como directorio de salida. Solo hay que importar el repositorio en Vercel.
+Ten en cuenta que cualquier persona que tenga el enlace de una tarjeta puede acceder a la información incluida en ella.
+Despliegue
+El proyecto está preparado para desplegarse en Vercel mediante la configuración incluida en vercel.json.
+
+Desarrollado por Enol Marqués.
